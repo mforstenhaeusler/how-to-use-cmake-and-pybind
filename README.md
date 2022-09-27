@@ -82,7 +82,7 @@ cd build
 cmake .. 
 make check -j 4
 ```
-or just run this insead of the last line
+or just run this instead of the last line
 ```
 make project
 ```
