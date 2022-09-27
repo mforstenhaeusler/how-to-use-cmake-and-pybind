@@ -88,11 +88,12 @@ make project
 ```
 
 ## 8. Create python wheel
+Inside the project folder, run the following.
 
 ```
 python setupy.py bdist_wheel
 ```
-**make sure wheel is install 
+**make sure wheel is installed
 
 ## 9. Test if python wheel works
 
