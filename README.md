@@ -22,7 +22,9 @@ You can find the path once CMake is installed under `Tools` --> `How to Install 
 CMake_path = /Applications/CMake.app/Contents/bin
 
 ## 2. Clone the [cmake_example](https://github.com/pybind/cmake_example) repository
-
+```
+git clone git@github.com:pybind/cmake_example.git
+```
 ## 3. Create your projct folder 
 ```
 .
