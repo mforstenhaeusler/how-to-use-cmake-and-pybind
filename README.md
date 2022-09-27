@@ -4,7 +4,7 @@ This repository explains how to create a python module from c++ code base using 
 ## 1. Install Dependencies 
 
 ### 1.1 Install Python 
-I recommand to use pyenv to handle your python versioning if you use macOS
+I recommand to use `pyenv to handle your python versioning if you use macOS
 - https://docs.brew.sh/Homebrew-and-Python#python-3y
 - https://www.freecodecamp.org/news/python-version-on-mac-update/
 
