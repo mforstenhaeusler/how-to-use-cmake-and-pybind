@@ -12,7 +12,7 @@ This repository explains how to create a python module from c++ code base using 
 ## 2. Clone the [cmake_example](https://github.com/pybind/cmake_example) repository
 
 ## 3. Create your projct folder 
-
+```
 .
 ├── project                   # Compiled files (alternatively `dist`)
 ├── docs                    # Documentation files (alternatively `doc`)
@@ -21,13 +21,14 @@ This repository explains how to create a python module from c++ code base using 
 ├── tools                   # Tools and utilities
 ├── LICENSE
 └── README.md
+```
 
 ## 4. Download [pybind11](https://github.com/pybind/pybind11) to this project folder
-
+```
 .
 ├── project                   # Compiled files (alternatively `dist`)
     ├── pybind11                    # Documentation files (alternatively `doc`)
-
+```
 ## 5. Copy the relevant files from the cmake_example to your project folder
 
 ### 5.1 CMakeLists
@@ -50,7 +51,7 @@ cp ../cmake_example/setup.py .
 ``` 
 mkdir build
 ```
-
+```
 .
 ├── project                   # Compiled files (alternatively `dist`)
     ├── build                    # Documentation files (alternatively `doc`)
