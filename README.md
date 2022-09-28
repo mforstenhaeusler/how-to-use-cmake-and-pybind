@@ -126,4 +126,154 @@ Our C++ code base works in python!
 
 
 ## 10. How to modifiy the c++ code
-#TODO
+Curretnly, in this example our c++ code base is all combiined in one c++ file (`src/main.cpp`). If you have more compelx code you would like to spread over a couple of modules, you can do the following for example. 
+
+### Current code:
+
+```
+#include <pybind11/pybind11.h>
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
+int add(int i, int j) {
+    return i + j;
+}
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(cmake_example, m) {
+    m.doc() = R"pbdoc(
+        Pybind11 example plugin
+        -----------------------
+
+        .. currentmodule:: cmake_example
+
+        .. autosummary::
+           :toctree: _generate
+
+           add
+           subtract
+    )pbdoc";
+
+    m.def("add", &add, R"pbdoc(
+        Add two numbers
+
+        Some other explanation about the add function.
+    )pbdoc");
+
+    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
+        Subtract two numbers
+
+        Some other explanation about the subtract function.
+    )pbdoc");
+
+#ifdef VERSION_INFO
+    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+    m.attr("__version__") = "dev";
+#endif
+}
+```
+
+CMakeLists.txt
+```
+cmake_minimum_required(VERSION 3.4...3.18)
+project(cmake_example)
+
+add_subdirectory(pybind11)
+pybind11_add_module(cmake_example src/main.cpp)
+
+# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
+# define (VERSION_INFO) here.
+target_compile_definitions(cmake_example PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+```
+
+### New Code
+Let's say we want to create a file that holds our math functions like add or subtract. Create a header file and c++ code file. 
+
+math.hpp
+```
+int add(int i, int j);
+
+int subtract(int i, int j);
+```
+
+math.cpp
+```
+#include "mymath.hpp"
+
+int add(int i, int j) {
+    return i + j;
+}
+
+int subtract(int i, int j) {
+    return i - j;
+}
+```
+
+main.cpp
+```
+#include <pybind11/pybind11.h>
+#include ""math.hpp"
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(cmake_example, m) {
+    m.doc() = R"pbdoc(
+        Pybind11 example plugin
+        -----------------------
+
+        .. currentmodule:: cmake_example
+
+        .. autosummary::
+           :toctree: _generate
+
+           add
+           subtract
+    )pbdoc";
+
+    m.def("add", &add, R"pbdoc(
+        Add two numbers
+
+        Some other explanation about the add function.
+    )pbdoc");
+
+    m.def("subtract", &subtract, R"pbdoc(
+        Subtract two numbers
+
+        Some other explanation about the subtract function.
+    )pbdoc");
+
+#ifdef VERSION_INFO
+    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+    m.attr("__version__") = "dev";
+#endif
+}
+```
+
+Further, some adjustments in the CMakeLists.txt file is necessary.
+
+CMakeLists.txt
+
+```
+cmake_minimum_required(VERSION 3.4...3.18)
+project(cmake_example)
+
+# add custom library 
+add_library(mymath STATIC src/mymath.cpp)
+set_target_properties(mymath PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_subdirectory(pybind11)
+pybind11_add_module(cmake_example src/main.cpp) # add library in cmake
+
+target_link_libraries(cmake_example PRIVATE mymath)
+
+# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
+# define (VERSION_INFO) here.
+target_compile_definitions(cmake_example PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+```
