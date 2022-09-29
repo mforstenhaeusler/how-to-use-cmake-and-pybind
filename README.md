@@ -277,3 +277,105 @@ target_link_libraries(cmake_example PRIVATE mymath)
 # define (VERSION_INFO) here.
 target_compile_definitions(cmake_example PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 ```
+
+## 11. More complex library structure
+
+Let's say you want to buiuld a project with a more sophisticated and complex module structre. 
+
+Your project could look something like this:
+```
+.
+├── project                   
+    ├── build
+    ├── pybind11
+    ├── lib
+        ├── add
+            ├── add.cpp
+            ├── add.hpp
+        ├── subtract
+            ├── subtract.cpp
+            ├── subtract.hpp
+    ├── src
+        ├── main.cpp
+    ├── CMakeLists.txt
+    └── setup.py
+```
+
+Then you need to add the following CMakeLists.txt file.
+
+```
+.
+├── project                   
+    ├── build
+    ├── pybind11
+    ├── lib
+        ├── add
+            ├── add.cpp
+            ├── add.hpp
+            ├── CMakeLists.txt  # Inner Leave
+        ├── subtract
+            ├── subtract.cpp
+            ├── subtract.hpp
+            ├── CMakeLists.txt # Inner leave
+        ├── CMakeLists.txt # Leave
+    ├── src
+        ├── main.cpp
+    ├── CMakeLists.txt # Root 
+    └── setup.py
+```
+
+The `Root`file would look something like this.
+
+```
+cmake_minimum_required(VERSION 3.4...3.18)
+
+project(project)
+
+# Set the output folder where your program will be created
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+# set this variable to specify a common place where CMake should put all executable files
+# (instead of CMAKE_CURRENT_BINARY_DIR)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+# set this variable to specify a common place where CMake should put all libraries
+# (instead of CMAKE_CURRENT_BINARY_DIR)
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+
+set(PROJECT_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
+
+
+# The following folder will be included
+include_directories("${PROJECT_SOURCE_DIR}")
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib)
+
+# add the executable
+add_executable(${PROJECT_NAME} ${PROJECT_SRC_DIR}/main.cpp)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC add subtract)
+
+# add the binary tree to the search path for include files
+target_include_directories(
+    supervoxel 
+     PUBLIC
+     ${PROJECT_BINARY_DIR}
+     ${LIBRARY_OUTPUT_PATH}/add
+     ${LIBRARY_OUTPUT_PATH}/subtract 
+)
+```
+
+The outer `Leave` file:
+
+```
+set(ADD_DIR ${PROJECT_SOURCE_DIR}/lib/add)
+set(SUBTRACT_DIR ${PROJECT_SOURCE_DIR}/lib/subtract)
+add_subdirectory(${MATH_DIR})
+```
+The inner `Leave` files:
+
+```
+add_library(add STATIC add.cpp add.hpp)
+```
+and 
+```
+add_library(subtract STATIC subtract.cpp subtract.hpp)
+```
